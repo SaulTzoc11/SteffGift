@@ -15,77 +15,91 @@
             background: linear-gradient(180deg, #ffafbd 0%, #ffc3a0 100%);
             font-family: 'Helvetica Neue', sans-serif;
             overflow: hidden;
-            color: #fff;
         }
 
         #overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.85);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 100;
+            transition: opacity 0.8s;
+        }
+
+        button {
+            padding: 18px 35px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 30px;
+            background: #e91e63;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+            cursor: pointer;
         }
 
         #canvas {
             position: relative;
             width: 100%;
-            height: 400px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
+            height: 350px;
+            overflow: hidden;
         }
 
-        .snoopy-container {
+        /* SNOOPY CAMINANDO */
+        .snoopy-walker {
             position: absolute;
-            bottom: 50px;
-            left: -150px;
-            width: 150px;
-            transition: all 2s ease-out;
-            text-align: center;
+            bottom: 20px;
+            left: -120px;
+            width: 100px;
+            /* La transición controla el desplazamiento, el GIF controla el movimiento de patas */
+            transition: left 3s linear; 
         }
 
-        /* Imagen de Snoopy - Fuente estable */
-        .snoopy-img { width: 100%; filter: drop-shadow(2px 2px 10px rgba(0,0,0,0.1)); }
-
-        /* Ramo de Flores - Tulipanes y Gerberas */
-        .bouquet {
+        /* RAMO DE FLORES */
+        .bouquet-container {
             position: absolute;
-            bottom: 120px;
+            bottom: 100px;
             left: 50%;
             transform: translateX(-50%) scale(0);
-            width: 200px;
-            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
             z-index: 10;
         }
 
-        .message {
-            margin-top: 20px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            text-align: center;
-            opacity: 0;
-            transition: opacity 1.5s;
-            padding: 0 20px;
+        .bouquet-img {
+            width: 180px;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));
         }
 
-        button {
-            padding: 20px 40px;
-            font-size: 1.2rem;
-            border: none;
-            border-radius: 50px;
-            background: #ff4b2b;
-            color: white;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-            cursor: pointer;
+        .message {
+            margin-top: 30px;
+            font-size: 1.4rem;
+            color: #fff;
+            text-align: center;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 1s;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Animación de flotado para las flores */
+        @keyframes float {
+            0% { transform: translate(-50%, 0px); }
+            50% { transform: translate(-50%, -15px); }
+            100% { transform: translate(-50%, 0px); }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
         }
     </style>
 </head>
 <body>
 
     <div id="overlay">
-        <button onclick="start()">Presiona aquí, Saúl te envió algo 🎁</button>
+        <button onclick="startAction()">Presiona aquí, Saúl te envió algo 🎁</button>
     </div>
 
     <audio id="musica" loop>
@@ -93,44 +107,47 @@
     </audio>
 
     <div id="canvas">
-        <img src="https://i.ibb.co/mS6m6mS/flowers-bouquet.png" id="bouquet" class="bouquet" alt="Ramo de Tulipanes y Gerberas">
-        
-        <div id="snoopy" class="snoopy-container">
-            <img src="https://upload.wikimedia.org/wikipedia/en/5/53/Snoopy_Peanuts.png" class="snoopy-img">
+        <div id="bouquet" class="bouquet-container">
+            <img src="https://i.ibb.co/LNN6pPK/bouquet-flowers.png" class="bouquet-img">
+        </div>
+
+        <div id="snoopy" class="snoopy-walker">
+            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2I4cjR6ZzR6ZzR6ZzR6ZzR6ZzR6ZzR6ZzR6ZzR6ZzR6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCBmcm9tX3NfdiZjdD1z/26vIg4xCXJlXQfXyM/giphy.gif" width="100%">
         </div>
     </div>
     
     <div id="text" class="message">
-        Un detalle especial para ti... <br>
-        🌷 Mis tulipanes y gerberas favoritos 🌼
+        Para ti, con mucho cariño... <br>
+        💐 Tulipanes y Gerberas 💐
     </div>
 
     <script>
-        function start() {
+        function startAction() {
+            // Quitar overlay y poner música
             document.getElementById('overlay').style.opacity = '0';
-            setTimeout(() => document.getElementById('overlay').remove(), 500);
-            
+            setTimeout(() => document.getElementById('overlay').remove(), 800);
             document.getElementById('musica').play();
 
             const snoopy = document.getElementById('snoopy');
             const bouquet = document.getElementById('bouquet');
             const text = document.getElementById('text');
 
-            // 1. Snoopy entra a escena
-            snoopy.style.left = 'calc(50% - 75px)';
+            // 1. Snoopy camina hasta el centro (tarda 3 segundos en cruzar)
+            snoopy.style.left = 'calc(50% - 50px)';
             
             setTimeout(() => {
-                // 2. Hace el gesto de entrega (un pequeño salto)
-                snoopy.style.transform = 'translateY(-20px)';
+                // 2. Se detiene y "saluda" cambiando un poco el tamaño
+                snoopy.style.transform = 'scale(1.1)';
                 
                 setTimeout(() => {
-                    snoopy.style.transform = 'translateY(0)';
-                    // 3. Aparece el Ramo grande
+                    // 3. Aparece el ramo de flores
                     bouquet.style.transform = 'translateX(-50%) scale(1)';
+                    bouquet.classList.add('floating');
+                    
                     // 4. Aparece el mensaje
                     text.style.opacity = '1';
-                }, 500);
-            }, 2100);
+                }, 1000);
+            }, 3000); // Espera a que termine de caminar
         }
     </script>
 </body>
