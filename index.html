@@ -12,7 +12,7 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
-            background-color: #fdf5f5; /* Color crema suave como el papel del dibujo */
+            background-color: #fff9f9; /* Color suave de fondo */
             font-family: 'Georgia', serif;
             overflow: hidden;
         }
@@ -20,77 +20,82 @@
         #overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.98);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 100;
-            transition: opacity 1s;
+            transition: opacity 1s ease;
         }
 
-        button {
-            padding: 15px 30px;
-            font-size: 1.1rem;
-            border: 1px solid #d4a3a3;
-            background: none;
-            color: #d4a3a3;
-            border-radius: 5px;
+        .btn-abrir {
+            padding: 15px 35px;
+            font-size: 1rem;
+            border: 2px solid #ffb7b7;
+            background: white;
+            color: #ffb7b7;
+            border-radius: 30px;
             cursor: pointer;
             letter-spacing: 2px;
+            transition: all 0.3s;
         }
 
-        .flower-container {
+        .btn-abrir:hover {
+            background: #ffb7b7;
+            color: white;
+        }
+
+        .flower-mask {
             position: relative;
-            width: 300px;
-            height: 450px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            width: 85vw;
+            max-width: 350px;
+            height: auto;
+            overflow: hidden; /* Esto permite el efecto de revelado */
         }
 
-        /* La imagen del ramo con efecto de máscara */
         #ramo {
             width: 100%;
-            height: auto;
-            opacity: 0;
-            clip-path: inset(100% 0 0 0); /* Empieza oculto desde abajo */
-            transition: opacity 1s, clip-path 4s ease-in-out;
+            display: block;
+            /* La imagen empieza "fuera" del contenedor por debajo */
+            transform: translateY(100%); 
+            transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .message {
-            margin-top: 20px;
-            color: #8e6d6d;
-            font-size: 1.2rem;
+            margin-top: 30px;
+            color: #d68e8e;
+            font-size: 1.1rem;
             text-align: center;
             opacity: 0;
             transition: opacity 2s;
-            max-width: 80%;
-            line-height: 1.5;
+            padding: 0 20px;
+            line-height: 1.6;
         }
 
-        /* Animación sutil de respiración para el ramo */
-        @keyframes sway {
-            0%, 100% { transform: rotate(-1deg); }
-            50% { transform: rotate(1deg); }
+        /* Pequeño brillo final */
+        @keyframes shine {
+            from { filter: brightness(1); }
+            to { filter: brightness(1.1); }
         }
-
-        .sway {
-            animation: sway 4s ease-in-out infinite;
+        .reveal-complete {
+            animation: shine 2s ease-in-out infinite alternate;
         }
     </style>
 </head>
 <body>
 
     <div id="overlay">
-        <button onclick="revealDrawing()">REVELAR REGALO</button>
+        <p style="color: #ffb7b7; margin-bottom: 20px;">Un detalle de Saúl</p>
+        <button class="btn-abrir" onclick="reveal()">ABRIR REGALO 🎁</button>
     </div>
 
     <audio id="musica" loop>
         <source src="https://www.mboxdrive.com/continuo_atardecer.mp3" type="audio/mpeg">
     </audio>
 
-    <div class="flower-container">
-        <img src="https://i.ibb.co/a92121/image-a92121.jpg" id="ramo" alt="Ramo de Tulipanes">
+    <div class="flower-mask">
+        <img src="image_a92121.jpg" id="ramo" alt="Ramo">
     </div>
     
     <div id="text" class="message">
@@ -99,27 +104,31 @@
     </div>
 
     <script>
-        function revealDrawing() {
-            // 1. Quitar el bloqueo y sonar música
-            document.getElementById('overlay').style.opacity = '0';
-            setTimeout(() => document.getElementById('overlay').remove(), 1000);
-            document.getElementById('musica').play();
-
+        function reveal() {
+            const overlay = document.getElementById('overlay');
             const ramo = document.getElementById('ramo');
             const text = document.getElementById('text');
+            const musica = document.getElementById('musica');
 
-            // 2. Iniciar efecto de "dibujo" (desplazando la máscara de abajo hacia arriba)
+            overlay.style.opacity = '0';
+            setTimeout(() => overlay.remove(), 1000);
+            
+            musica.play();
+
+            // Inicia el efecto de "dibujo" subiendo la imagen
             setTimeout(() => {
-                ramo.style.opacity = '1';
-                ramo.style.clipPath = 'inset(0% 0 0 0)';
-                ramo.classList.add('sway');
-
-                // 3. Mostrar el mensaje al final del dibujo
+                ramo.style.transform = 'translateY(0)';
+                
                 setTimeout(() => {
                     text.style.opacity = '1';
-                }, 3500);
+                    ramo.classList.add('reveal-complete');
+                }, 3500); // Aparece el texto cuando el dibujo casi termina
             }, 500);
         }
     </script>
 </body>
 </html>
+    </script>
+</body>
+</html>
+
